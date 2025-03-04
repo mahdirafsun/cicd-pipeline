@@ -23,12 +23,80 @@ jobs:
         if: success()
         run: |
           curl -X POST -H 'Content-type: application/json' --data '{
-            "text": "✅ CD Deployment Successful!\n🎉 The deployment for *rafsunmahdi/cicd-pipeline* was successful!"
+            "blocks": [
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Ref*\n${{ github.ref }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Event*\n${{ github.event_name }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Actions URL*\nCD Pipeline"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Commit*\n${{ github.sha::7 }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "✅ CD Deployment Successful!\n:tada: The deployment for *rafsunmahdi/cicd-pipeline* was successful! :white_check_mark:"
+                }
+              }
+            ]
           }' ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Send Slack Notification (Failure)
         if: failure()
         run: |
           curl -X POST -H 'Content-type: application/json' --data '{
-            "text": "❌ CD Deployment Failed!\n🚨 The deployment for *rafsunmahdi/cicd-pipeline* failed! Check GitHub Actions logs."
+            "blocks": [
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Ref*\n${{ github.ref }}"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Event*\n${{ github.event_name }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "fields": [
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Actions URL*\nCD Pipeline"
+                  },
+                  {
+                    "type": "mrkdwn",
+                    "text": "*Commit*\n${{ github.sha::7 }}"
+                  }
+                ]
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "❌ CD Deployment Failed!\n:warning: The deployment for *rafsunmahdi/cicd-pipeline* failed! Check GitHub Actions logs."
+                }
+              }
+            ]
           }' ${{ secrets.SLACK_WEBHOOK_URL }}
