@@ -29,6 +29,25 @@ jobs:
         docker push rafsunmahdi/cicd-pipeline:${{ github.sha }}
         docker push rafsunmahdi/cicd-pipeline:latest
 
+    # Add Grafana metrics
+    - name: Send Deployment Metrics to Grafana
+      if: success()  # Only send metrics if deployment succeeded
+      run: |
+        curl -X POST https://amit2025.grafana.net/api/annotations \
+        -H "Authorization: Bearer ${{ secrets.GRAFANA_API_KEY }}" \
+        -H "Content-Type: application/json" \
+        --data '{
+          "tags": ["deployment"],
+          "text": "New deployment completed for ${{ github.repository }} on branch ${{ github.ref_name }}",
+          "time": '$(date +%s000)',
+          "data": {
+            "repository": "${{ github.repository }}",
+            "branch": "${{ github.ref_name }}",
+            "commit": "${{ github.sha }}",
+            "triggered_by": "${{ github.actor }}"
+          }
+        }'
+
     # 📢 Send Slack Notification on Success
     - name: Send Slack Notification (Success)
       if: success()
