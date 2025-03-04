@@ -48,6 +48,33 @@ jobs:
           }
         }'
 
+    # Add Prometheus metrics
+    - name: Export GitHub Actions Metrics to Prometheus
+      uses: actions/github-script@v6
+      if: always()  # Run this step regardless of previous step status
+      with:
+        script: |
+          const startTime = new Date(${{ github.event.repository.created_at }});
+          const endTime = new Date();
+          const duration = (endTime - startTime) / 1000; // Convert to seconds
+          
+          const metrics = {
+            ci_pipeline_duration: duration,
+            ci_pipeline_success: ${{ job.status == 'success' }} ? 1 : 0,
+            ci_pipeline_failures: ${{ job.status == 'failure' }} ? 1 : 0,
+            ci_pipeline_timestamp: Math.floor(Date.now() / 1000),
+            ci_pipeline_branch: '${{ github.ref_name }}',
+            ci_pipeline_commit: '${{ github.sha }}'
+          };
+          
+          console.log(`Exporting Metrics: ${JSON.stringify(metrics, null, 2)}`);
+          
+          // You might want to send these metrics to your Prometheus instance
+          // This is just logging them for now
+          Object.entries(metrics).forEach(([key, value]) => {
+            console.log(`${key} ${value}`);
+          });
+
     # 📢 Send Slack Notification on Success
     - name: Send Slack Notification (Success)
       if: success()
