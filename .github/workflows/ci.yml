@@ -29,3 +29,4 @@ jobs:
       run: |
         docker push rafsunmahdi/cicd-pipeline:${{ github.sha }}
         docker push rafsunmahdi/cicd-pipeline:latest
+        
