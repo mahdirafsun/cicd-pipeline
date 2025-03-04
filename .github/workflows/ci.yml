@@ -3,7 +3,7 @@ name: CI Pipeline
 on:
   push:
     branches: 
-      - '**'  # This will match all branches
+      - '**'  # This will match all branche
   pull_request:
     branches: [ "*" ]
 
