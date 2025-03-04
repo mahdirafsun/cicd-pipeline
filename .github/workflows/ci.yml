@@ -54,3 +54,49 @@ jobs:
         SLACK_TITLE: "❌ CI Build Failed!"
         SLACK_MESSAGE: "🚨 The CI build for *rafsunmahdi/cicd-pipeline* failed! Check GitHub Actions logs."
     
+    # 📩 Send Email Notification on Success
+    - name: Send Email Notification (Success)
+      if: success()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "✅ CI Build Passed - rafsunmahdi/cicd-pipeline"
+        html_body: |
+          <h2>CI Build Success Notification</h2>
+          <p>🎉 Good news! The CI build for <strong>rafsunmahdi/cicd-pipeline</strong> was successful.</p>
+          <p>Build Details:</p>
+          <ul>
+            <li>Repository: ${{ github.repository }}</li>
+            <li>Branch: ${{ github.ref_name }}</li>
+            <li>Commit: ${{ github.sha }}</li>
+            <li>Triggered by: ${{ github.actor }}</li>
+          </ul>
+        to: ${{ secrets.EMAIL_TO }}
+        from: CI/CD Pipeline <${{ secrets.EMAIL_USERNAME }}>
+
+    # 📩 Send Email Notification on Failure
+    - name: Send Email Notification (Failure)
+      if: failure()
+      uses: dawidd6/action-send-mail@v3
+      with:
+        server_address: smtp.gmail.com
+        server_port: 587
+        username: ${{ secrets.EMAIL_USERNAME }}
+        password: ${{ secrets.EMAIL_PASSWORD }}
+        subject: "❌ CI Build Failed - rafsunmahdi/cicd-pipeline"
+        html_body: |
+          <h2>CI Build Failure Notification</h2>
+          <p>🚨 The CI build for <strong>rafsunmahdi/cicd-pipeline</strong> has failed.</p>
+          <p>Build Details:</p>
+          <ul>
+            <li>Repository: ${{ github.repository }}</li>
+            <li>Branch: ${{ github.ref_name }}</li>
+            <li>Commit: ${{ github.sha }}</li>
+            <li>Triggered by: ${{ github.actor }}</li>
+          </ul>
+          <p>Please check the <a href="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}">GitHub Actions logs</a> for more details.</p>
+        to: ${{ secrets.EMAIL_TO }}
+        from: CI/CD Pipeline <${{ secrets.EMAIL_USERNAME }}>
