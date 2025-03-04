@@ -77,7 +77,7 @@ jobs:
         to: ${{ secrets.EMAIL_TO }}
         from: CI/CD Pipeline <${{ secrets.EMAIL_USERNAME }}>
 
-    # 📩 Send Email Notification on Failure
+    # 📩 Send Email Notification on Failures
     - name: Send Email Notification (Failure)
       if: failure()
       uses: dawidd6/action-send-mail@v3
