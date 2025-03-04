@@ -29,6 +29,28 @@ jobs:
         docker push rafsunmahdi/cicd-pipeline:${{ github.sha }}
         docker push rafsunmahdi/cicd-pipeline:latest
 
+    # 🔥 Send GitHub Actions Metrics to Prometheus
+    - name: Send Prometheus Metrics
+      if: always()  # Run this step regardless of previous step status
+      run: |
+        # Basic pipeline status metric
+        echo "github_actions_jobs{status='${{ job.status }}', job='ci_pipeline', branch='${{ github.ref_name }}', commit='${{ github.sha }}'} 1" | \
+        curl --data-binary @- "https://prometheus-prod-56-prod-us-east-2.grafana.net/api/prom/push" \
+          -H "Authorization: Bearer ${{ secrets.GRAFANA_API_KEY }}" \
+          -H "Content-Type: text/plain"
+
+        # Pipeline duration metric (if you want to track duration)
+        echo "github_actions_duration_seconds{job='ci_pipeline', branch='${{ github.ref_name }}'} $SECONDS" | \
+        curl --data-binary @- "https://prometheus-prod-56-prod-us-east-2.grafana.net/api/prom/push" \
+          -H "Authorization: Bearer ${{ secrets.GRAFANA_API_KEY }}" \
+          -H "Content-Type: text/plain"
+
+        # Pipeline success/failure metric
+        echo "github_actions_result{job='ci_pipeline', branch='${{ github.ref_name }}'} ${{ job.status == 'success' && 1 || 0 }}" | \
+        curl --data-binary @- "https://prometheus-prod-56-prod-us-east-2.grafana.net/api/prom/push" \
+          -H "Authorization: Bearer ${{ secrets.GRAFANA_API_KEY }}" \
+          -H "Content-Type: text/plain"
+
     # Add Grafana metrics
     - name: Send Deployment Metrics to Grafana
       if: success()  # Only send metrics if deployment succeeded
